@@ -1,3 +1,12 @@
+/**
+ * -----------------------------------------------------------------------------
+ * Author      : Prathmesh Rewale (https://github.com/prathmeshrewale)
+ * Date        : 2025-09-01
+ * Company     : Webzworld
+ * File        : AdmissionFormDocuments.java
+ * Purpose     : Creates AdmissionFormDocuments Entity for the application
+ * -----------------------------------------------------------------------------
+ */
 package com.mac.arbitrator.entity;
 
 import jakarta.persistence.*;
@@ -19,6 +28,15 @@ public class AdmissionFormDocuments {
 
     @Column(name = "poa_loa_idcard", nullable = false)
     private String poaLoaIdCard;
+
+    @Column(name = "lrn_demand_notice", nullable = false)
+    private String lrnDemandNotice;
+
+    @Column(name = "agreement_contract", nullable = false)
+    private String agreementContract;
+
+    @Column(name= "orders", nullable = false)
+    private String orders;
 
 
 }

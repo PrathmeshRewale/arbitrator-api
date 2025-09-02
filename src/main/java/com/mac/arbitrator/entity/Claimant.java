@@ -1,3 +1,13 @@
+/**
+ * -----------------------------------------------------------------------------
+ * Author      : Prathmesh Rewale (https://github.com/prathmeshrewale)
+ * Date        : 2025-09-01
+ * Company     : Webzworld
+ * File        : Claimant.java
+ * Purpose     : Creates Claimant Entity for the application
+ * -----------------------------------------------------------------------------
+ */
+
 package com.mac.arbitrator.entity;
 
 

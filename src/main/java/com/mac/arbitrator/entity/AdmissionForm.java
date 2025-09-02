@@ -42,4 +42,16 @@ public class AdmissionForm {
 
     @Column(name = "claim_amount", nullable = false)
     private Float claimAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false , columnDefinition = "VARCHAR(20) DEFAULT 'DRAFT'")
+    private Status status;
+
+    private enum Status {
+        DRAFT,
+        SUBMITTED,
+        UNDER_REVIEW,
+        APPROVED,
+        REJECTED
+    }
 }
