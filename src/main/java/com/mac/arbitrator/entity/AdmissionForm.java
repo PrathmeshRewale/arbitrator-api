@@ -38,7 +38,7 @@ public class AdmissionForm {
     private String arbitrationClause;
 
     @Column(name = "refiefsought", nullable = false)
-    private String refiefsought;
+    private String refiefSought;
 
     @Column(name = "claim_amount", nullable = false)
     private Float claimAmount;
@@ -47,7 +47,7 @@ public class AdmissionForm {
     @Column(name = "status", nullable = false , columnDefinition = "VARCHAR(20) DEFAULT 'DRAFT'")
     private Status status;
 
-    private enum Status {
+    public enum Status {
         DRAFT,
         SUBMITTED,
         UNDER_REVIEW,

@@ -18,7 +18,7 @@ public class AdmissionRequestDto {
 
     private String arbitrationClause;
 
-    private String refiefsought;
+    private String refiefSought;
 
     private Float claimAmount;
 
