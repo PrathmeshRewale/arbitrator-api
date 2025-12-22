@@ -9,23 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ClaimantResponseDto {
-
     private Long id;
-
     private String fullName;
-
     private String phoneNumber;
-
     private String address;
-
     private String email;
-
     private String country;
-
     private String state;
-
     private String city;
-
     private String zipCode;
-
+    private String secondaryAddress;
+    private String secondaryEmail;
+    private String secondaryCountry;
+    private String secondaryState;
+    private String secondaryCity;
+    private String secondaryZipCode;
 }

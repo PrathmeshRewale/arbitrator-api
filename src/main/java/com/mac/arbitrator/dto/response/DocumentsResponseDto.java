@@ -9,14 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class DocumentsResponseDto {
-
     private Long id;
-
     private String poaLoaIdCard;
-
     private String lrnDemandNotice;
-
     private String agreementContract;
-
     private String orders;
 }

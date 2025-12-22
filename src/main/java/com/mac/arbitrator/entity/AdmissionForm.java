@@ -10,10 +10,15 @@
 
 package com.mac.arbitrator.entity;
 
+import com.mac.arbitrator.entity.enums.AdmissionFormStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -31,13 +36,17 @@ public class AdmissionForm {
     @Column(name = "default_title", nullable = false)
     private String defaultClause;
 
-    @Column(name = "jurdisction", nullable = false)
-    private String jurdisction;
+    @Column(name = "jurdisction_id", nullable = false)
+    private Long jurisdictionId;
+
+    @Column(name = "jurdisction_name", nullable = false)
+    private String jurisdictionName;
 
     @Column(name = "arbitration_clause", nullable = false)
     private String arbitrationClause;
 
-    @Column(name = "refiefsought", nullable = false)
+    @Lob
+    @Column(name = "refiefsought", nullable = false,columnDefinition = "LONGTEXT")
     private String refiefSought;
 
     @Column(name = "claim_amount", nullable = false)
@@ -45,13 +54,7 @@ public class AdmissionForm {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false , columnDefinition = "VARCHAR(20) DEFAULT 'DRAFT'")
-    private Status status;
+    private AdmissionFormStatus status;
 
-    public enum Status {
-        DRAFT,
-        SUBMITTED,
-        UNDER_REVIEW,
-        APPROVED,
-        REJECTED
-    }
+    private Instant createdAt;
 }

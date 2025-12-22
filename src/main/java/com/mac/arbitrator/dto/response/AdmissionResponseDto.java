@@ -16,7 +16,9 @@ public class AdmissionResponseDto {
 
     private String defaultClause;
 
-    private String jurdisction;
+    private Long jurisdictionId;
+
+    private String jurisdictionName;
 
     private String arbitrationClause;
 

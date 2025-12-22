@@ -56,4 +56,16 @@ public class Claimant {
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
+    private String secondaryAddress;
+
+    private String secondaryEmail;
+
+    private String secondaryCountry;
+
+    private String secondaryState;
+
+    private String secondaryCity;
+
+    private String secondaryZipCode;
+
 }
