@@ -16,16 +16,44 @@ public class ClaimantResponseDto {
 
     private String phoneNumber;
 
-    private String address;
+    private Long partyTypeId;
+
+    private String partyTypeName;
 
     private String email;
 
-    private String country;
+    private Long countryId;
 
-    private String state;
+    private String countryName;
 
-    private String city;
+    private Long stateId;
+
+    private String stateName;
+
+    private Long cityId;
+
+    private String cityName;
 
     private String zipCode;
+
+    private String address;
+
+    private String secondaryEmail;
+
+    private Long secondaryCountryId;
+
+    private String secondaryCountryName;
+
+    private Long secondaryStateId;
+
+    private String secondaryStateName;
+
+    private Long secondaryCityId;
+
+    private String secondaryCityName;
+
+    private String secondaryZipCode;
+
+    private String secondaryAddress;
 
 }

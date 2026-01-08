@@ -1,0 +1,7 @@
+package com.mac.arbitrator.repository;
+
+import com.mac.arbitrator.entity.Payment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
+}

@@ -1,10 +1,10 @@
 package com.mac.arbitrator.dto.response;
 
-import com.mac.arbitrator.dto.request.DocumentsRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -16,13 +16,17 @@ public class AdmissionResponseDto {
 
     private String defaultClause;
 
-    private String jurdisction;
+    private Long jurisdictionId;
+
+    private String jurisdictionName;
 
     private String arbitrationClause;
 
     private String refiefSought;
 
-    private Float claimAmount;
+    private Float disputeAmount;
+
+    private LocalDate disputeDate;
 
     private List<ClaimantResponseDto> claimants;
 
@@ -31,4 +35,6 @@ public class AdmissionResponseDto {
     private DocumentsResponseDto documents;
 
     private String status;
+
+    private LocalDate createdAt;
 }

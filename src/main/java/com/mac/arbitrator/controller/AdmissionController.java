@@ -10,35 +10,42 @@
 package com.mac.arbitrator.controller;
 
 import com.mac.arbitrator.dto.GenericResponseDto;
-import com.mac.arbitrator.dto.request.AdmissionRequestDto;
+import com.mac.arbitrator.dto.request.create.CreateAdmissionRequestDto;
 import com.mac.arbitrator.dto.response.AdmissionResponseDto;
 import com.mac.arbitrator.service.AdmissionFormService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/api/admission")
 public class AdmissionController {
 
-    private AdmissionFormService AdmissionFormService;
+    private final AdmissionFormService admissionFormService;
 
     public AdmissionController(AdmissionFormService admissionFormService) {
-        AdmissionFormService = admissionFormService;
+        this.admissionFormService = admissionFormService;
     }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllAdmissions(){
-        return new ResponseEntity<>( AdmissionFormService.getAllAdmissions(), HttpStatus.OK);
+        return new ResponseEntity<>( admissionFormService.getAllAdmissions(), HttpStatus.OK);
     }
+
+    @GetMapping("/admissions")
+    public Page<AdmissionResponseDto> getAllAdmissions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return admissionFormService.getAllAdmissions(page, size);
+    }
+
 
     @GetMapping("/admission_form/{id}")
     public ResponseEntity<?> getAdmissionById(@PathVariable Long id){
-        AdmissionResponseDto admissionResponseDto = AdmissionFormService.getAdmissionById(id);
+        AdmissionResponseDto admissionResponseDto = admissionFormService.getAdmissionById(id);
         if(admissionResponseDto != null){
             return new ResponseEntity<>(admissionResponseDto, HttpStatus.OK);
         } else {
@@ -47,18 +54,18 @@ public class AdmissionController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createAdmission(@RequestBody AdmissionRequestDto admissionRequestDto){
-        return new ResponseEntity<>(AdmissionFormService.createAdmission(admissionRequestDto), HttpStatus.OK);
+    public ResponseEntity<?> createAdmission(@RequestBody CreateAdmissionRequestDto createAdmissionRequestDto){
+        return new ResponseEntity<>(admissionFormService.createAdmission(createAdmissionRequestDto), HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateAdmission(@PathVariable Long id, @RequestBody AdmissionRequestDto admissionRequestDto){
-        return new ResponseEntity<>(AdmissionFormService.updateAdmission(id, admissionRequestDto), HttpStatus.OK);
-    }
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<?> updateAdmission(@PathVariable Long id, @RequestBody CreateAdmissionRequestDto createAdmissionRequestDto){
+//        return new ResponseEntity<>(admissionFormService.updateAdmission(id, createAdmissionRequestDto), HttpStatus.OK);
+//    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteAdmission(@PathVariable Long id){
-        return new ResponseEntity<>(AdmissionFormService.deleteAdmission(id), HttpStatus.OK);
+        return new ResponseEntity<>(admissionFormService.deleteAdmission(id), HttpStatus.OK);
     }
 
 

@@ -26,10 +26,10 @@ public class AdmissionFormDocuments {
     @Column(name = "admission_form_id", nullable = false)
     private Long admissionFormId;
 
-    @Column(name = "poa_loa_idcard", nullable = false)
+    @Column(name = "poa_loa_idcard", nullable = true)
     private String poaLoaIdCard;
 
-    @Column(name = "lrn_demand_notice", nullable = false)
+    @Column(name = "lrn_demand_notice", nullable = true)
     private String lrnDemandNotice;
 
     @Column(name = "agreement_contract", nullable = false)
@@ -37,6 +37,4 @@ public class AdmissionFormDocuments {
 
     @Column(name= "orders", nullable = false)
     private String orders;
-
-
 }
