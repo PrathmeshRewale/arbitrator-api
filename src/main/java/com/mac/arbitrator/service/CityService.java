@@ -14,7 +14,7 @@ public interface CityService {
     GenericResponseDto delete(Long id);
     List<CityMiniResponseDto> getAllCityMini();
     CityResponseDto getCityById(Long id);
-    List<CityResponseDto> getAllCountries();
+    List<CityResponseDto> getAllCity();
     GenericResponseDto bulkInsert(List<CreateCityRequestDto> createCityRequestDtos);
     Boolean checkAvailability(String name);
     void deleteByStateId(Long stateId);

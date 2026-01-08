@@ -14,7 +14,7 @@ public interface StateService {
     GenericResponseDto delete(Long id);
     List<StateMiniResponseDto> getAllStateMini();
     StateResponseDto getStateById(Long id);
-    List<StateResponseDto> getAllCountries();
+    List<StateResponseDto> getAllState();
     GenericResponseDto bulkInsert(List<CreateStateRequestDto> createStateRequestDtos);
     Boolean checkAvailability(String name);
     void deleteByCountryId(Long countryId);

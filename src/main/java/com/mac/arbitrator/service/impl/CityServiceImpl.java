@@ -76,7 +76,7 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public List<CityResponseDto> getAllCountries() {
+    public List<CityResponseDto> getAllCity() {
         return cityRepository.findAll().stream().map(this::mapToDto).toList();
     }
 

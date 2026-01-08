@@ -15,7 +15,7 @@ public interface PartyTypeService {
     GenericResponseDto delete(Long id);
     List<PartyTypeMiniResponseDto> getAllPartyTypeMini();
     PartyTypeResponseDto getPartyTypeById(Long id);
-    List<PartyTypeResponseDto> getAllCountries();
+    List<PartyTypeResponseDto> getAllPartyType();
     GenericResponseDto bulkInsert(List<CreatePartyTypeRequestDto> createPartyTypeRequestDtos);
     Boolean checkAvailability(String name);
 }

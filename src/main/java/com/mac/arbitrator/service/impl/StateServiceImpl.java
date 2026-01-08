@@ -79,7 +79,7 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
-    public List<StateResponseDto> getAllCountries() {
+    public List<StateResponseDto> getAllState() {
         return stateRepository.findAll().stream().map(this::mapToDto).toList();
     }
 

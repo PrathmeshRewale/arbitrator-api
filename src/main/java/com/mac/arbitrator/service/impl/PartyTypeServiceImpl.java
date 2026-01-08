@@ -69,7 +69,7 @@ public class PartyTypeServiceImpl implements PartyTypeService {
     }
 
     @Override
-    public List<PartyTypeResponseDto> getAllCountries() {
+    public List<PartyTypeResponseDto> getAllPartyType() {
         return partyTypeRepository.findAll().stream().map(this::mapToDto).toList();
     }
 

@@ -69,7 +69,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     @Override
-    public List<JurisdictionResponseDto> getAllCountries() {
+    public List<JurisdictionResponseDto> getAllJurisdiction() {
         return jurisdictionRepository.findAll().stream().map(this::mapToDto).toList();
     }
 

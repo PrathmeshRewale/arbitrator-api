@@ -14,7 +14,7 @@ public interface JurisdictionService {
     GenericResponseDto delete(Long id);
     List<JurisdictionMiniResponseDto> getAllJurisdictionMini();
     JurisdictionResponseDto getJurisdictionById(Long id);
-    List<JurisdictionResponseDto> getAllCountries();
+    List<JurisdictionResponseDto> getAllJurisdiction();
     GenericResponseDto bulkInsert(List<CreateJurisdictionRequestDto> createJurisdictionRequestDtos);
     Boolean checkAvailability(String name);
 }
