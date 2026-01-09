@@ -31,12 +31,17 @@ public class CityController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCity(@PathVariable Long id){
-        return  ResponseEntity.ok(id);
+        return  ResponseEntity.ok(cityService.delete(id));
     }
 
     @GetMapping("/mini")
     public ResponseEntity<?> getAllCityMini(){
         return ResponseEntity.ok(cityService.getAllCityMini());
+    }
+
+    @GetMapping("/mini/{stateId}")
+    public ResponseEntity<?> getAllCityMini(@PathVariable Long stateId){
+        return ResponseEntity.ok(cityService.getAllCityMiniByStateId(stateId));
     }
 
     @GetMapping("/{id}")

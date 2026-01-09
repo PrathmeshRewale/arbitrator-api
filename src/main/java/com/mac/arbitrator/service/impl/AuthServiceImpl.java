@@ -4,17 +4,19 @@ import com.mac.arbitrator.dto.GenericResponseDto;
 import com.mac.arbitrator.dto.request.ForgotPasswordRequestDto;
 import com.mac.arbitrator.dto.request.LoginRequestRequestDto;
 import com.mac.arbitrator.dto.request.VerifyOtpRequestDto;
+import com.mac.arbitrator.dto.request.create.CreateAdmissionFormUserRequestDto;
 import com.mac.arbitrator.dto.request.create.CreateEmailRequestDto;
+import com.mac.arbitrator.dto.request.create.CreateUserRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdatedUserPasswordRequestDto;
 import com.mac.arbitrator.dto.response.LoginResponseDto;
-import com.mac.arbitrator.entity.Role;
-import com.mac.arbitrator.entity.User;
-import com.mac.arbitrator.entity.UserOtp;
-import com.mac.arbitrator.repository.UserOtpRepository;
-import com.mac.arbitrator.repository.UserRepository;
+import com.mac.arbitrator.entity.*;
+import com.mac.arbitrator.entity.enums.UserCaseType;
+import com.mac.arbitrator.repository.*;
 import com.mac.arbitrator.service.AuthService;
 import com.mac.arbitrator.service.EmailService;
 import com.mac.arbitrator.service.RoleService;
+import com.mac.arbitrator.repository.UserRepository;
+import com.mac.arbitrator.service.UserService;
 import com.mac.arbitrator.util.JwtUtil;
 import com.mac.arbitrator.util.MailTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -37,8 +40,11 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+    private final AdmissionFormClaimantRepository admissionFormClaimantRepository;
+    private final AdmissionFormRespondantRepository admissionFormRespondantRepository;
+    private final AdmissionFormUserRepository admissionFormUserRepository;
 
-    public AuthServiceImpl(UserRepository userRepository, UserOtpRepository userOtpRepository, AuthenticationManager authenticationManager, EmailService emailService, JwtUtil jwtUtil, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository, UserOtpRepository userOtpRepository, AuthenticationManager authenticationManager, EmailService emailService, JwtUtil jwtUtil, RoleService roleService, PasswordEncoder passwordEncoder, AdmissionFormClaimantRepository admissionFormClaimantRepository, AdmissionFormRespondantRepository admissionFormRespondantRepository, AdmissionFormUserRepository admissionFormUserRepository) {
         this.userRepository = userRepository;
         this.userOtpRepository = userOtpRepository;
         this.authenticationManager = authenticationManager;
@@ -46,12 +52,93 @@ public class AuthServiceImpl implements AuthService {
         this.jwtUtil = jwtUtil;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
+        this.admissionFormClaimantRepository = admissionFormClaimantRepository;
+        this.admissionFormRespondantRepository = admissionFormRespondantRepository;
+        this.admissionFormUserRepository = admissionFormUserRepository;
     }
 
     private static final long OTP_EXPIRY_DURATION_MS = 10 * 60 * 1000;
     private static final int OTP_LENGTH = 6;
     private static final String OTP_CHARACTERS = "0123456789";
 
+
+    @Override
+    public GenericResponseDto registerAdmissionFormUser(CreateAdmissionFormUserRequestDto req) {
+        //existing user id user mail already existed
+        User user1 = userRepository.findByUsernameOrEmail("",req.getUserEmail());
+        if(user1 != null){
+            return new GenericResponseDto(
+                    "error",
+                    "User with email already existed"
+            );
+        }
+
+        List<AdmissionFormClaimant> admissionFormClaimants =
+                admissionFormClaimantRepository.findByAdmissionFormId(req.getAdmissionId());
+
+        List<AdmissionFormRespondant> admissionFormRespondants =
+                admissionFormRespondantRepository.findByAdmissionFormId(req.getAdmissionId());
+
+        UserCaseType userType = null;
+        String secondaryEmail = null;
+
+        // Check in claimants
+        for (AdmissionFormClaimant claimant : admissionFormClaimants) {
+            if (claimant.getEmail().equalsIgnoreCase(req.getUserEmail())) {
+                userType = UserCaseType.CLAIMANT;
+                secondaryEmail = claimant.getSecondaryEmail();
+                break;
+            }
+        }
+
+        // If not claimant, check in respondents
+        if (userType == null) {
+            for (AdmissionFormRespondant respondent : admissionFormRespondants) {
+                if (respondent.getEmail().equalsIgnoreCase(req.getUserEmail())) {
+                    userType = UserCaseType.RESPONDANT;
+                    secondaryEmail = respondent.getSecondaryEmail();
+                    break;
+                }
+            }
+        }
+
+        // If user is neither claimant nor respondent
+        if (userType == null) {
+            return new GenericResponseDto(
+                    "error",
+                    "You're not associated with this admission form"
+            );
+        }
+
+        // Assign role based on user type
+        Role role;
+        if (userType == UserCaseType.CLAIMANT) {
+            role = roleService.getRoleByName("CLAIMANT");
+        } else {
+            role = roleService.getRoleByName("RESPONDENT");
+        }
+
+        User createUserRequestDto = new User();
+        createUserRequestDto.setEmail(req.getUserEmail());
+        createUserRequestDto.setPassword(passwordEncoder.encode(req.getPassword()));
+        createUserRequestDto.setAlternativeEmail(secondaryEmail);
+        createUserRequestDto.setPhoneNo(req.getPhoneNo());
+        createUserRequestDto.setFullName(req.getFullName());
+        createUserRequestDto.setUsername(req.getUsername());
+        createUserRequestDto.setRoleId(role.getId());
+        createUserRequestDto.setRoleName(role.getName());
+
+        User user = userRepository.save(createUserRequestDto);
+
+        AdmissionFormUser admissionFormUser = new AdmissionFormUser();
+        admissionFormUser.setAdmissionId(req.getAdmissionId());
+        admissionFormUser.setUserId(user.getId());
+        admissionFormUser.setUserCaseType(userType);
+
+        admissionFormUserRepository.save(admissionFormUser);
+
+        return new GenericResponseDto("success","record added successfully");
+    }
 
 
     @Override

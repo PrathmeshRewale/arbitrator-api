@@ -19,10 +19,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long admissionId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long mediationId;
 
     @Column(nullable = false)

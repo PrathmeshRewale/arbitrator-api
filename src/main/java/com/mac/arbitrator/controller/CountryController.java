@@ -31,7 +31,7 @@ public class CountryController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCountry(@PathVariable Long id){
-        return  ResponseEntity.ok(id);
+        return  ResponseEntity.ok(countryService.delete(id));
     }
 
     @GetMapping("/mini")

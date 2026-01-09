@@ -9,6 +9,7 @@ import java.util.List;
 public interface RoleService {
     GenericResponseDto updatedRole(Long id, UpdateRoleRequestDto updateRoleRequest);
     Role getById(Long id);
+    Role getRoleByName(String name);
     List<Role> getAllRole();
     void deleteById(Long id);
 }

@@ -5,10 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
+
 public interface CityRepository extends JpaRepository<City, Long> {
     Boolean existsByName(String name);
-
     @Modifying
     @Transactional
     void deleteAllByStateId(Long countryId);
+    List<City> findAllByStateId(Long stateId);
 }

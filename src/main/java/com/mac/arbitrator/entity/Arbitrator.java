@@ -41,7 +41,7 @@ public class Arbitrator {
     private LocalDate enrollmentDate;
 
     @Column(name = "jurisdiction_id", nullable = false)
-    private String jurisdictionId;
+    private Long jurisdictionId;
 
     @Column(name = "jurisdiction_name", nullable = false)
     private String jurisdictionName;

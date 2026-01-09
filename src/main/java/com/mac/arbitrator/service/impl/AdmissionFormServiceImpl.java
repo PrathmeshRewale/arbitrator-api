@@ -6,18 +6,14 @@ import com.mac.arbitrator.dto.response.AdmissionResponseDto;
 import com.mac.arbitrator.dto.response.ClaimantResponseDto;
 import com.mac.arbitrator.dto.response.DocumentsResponseDto;
 import com.mac.arbitrator.dto.response.RespondantResponseDto;
-import com.mac.arbitrator.entity.AdmissionForm;
-import com.mac.arbitrator.entity.AdmissionFormDocuments;
-import com.mac.arbitrator.entity.AdmissionFormClaimant;
-import com.mac.arbitrator.entity.AdmissionFormRespondant;
+import com.mac.arbitrator.entity.*;
 import com.mac.arbitrator.entity.enums.FormStatus;
+import com.mac.arbitrator.entity.enums.UserCaseType;
 import com.mac.arbitrator.exception.ResourceNotFoundException;
-import com.mac.arbitrator.repository.AdmissionFormDocumentsRepository;
-import com.mac.arbitrator.repository.AdmissionFormRepository;
-import com.mac.arbitrator.repository.AdmissionFormClaimantRepository;
-import com.mac.arbitrator.repository.AdmissionFormRespondantRepository;
+import com.mac.arbitrator.repository.*;
 import com.mac.arbitrator.service.AdmissionFormService;
 import com.mac.arbitrator.service.EmailService;
+import com.mac.arbitrator.service.UserService;
 import com.mac.arbitrator.util.MailTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,9 +32,13 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
     private AdmissionFormClaimantRepository claimantRepository;
     private AdmissionFormRespondantRepository respondantRepository;
     private final EmailService emailService;
+    private final AdmissionFormUserRepository admissionFormUserRepository;
+    private final UserService userService;
 
-    public AdmissionFormServiceImpl(EmailService emailService, AdmissionFormRespondantRepository respondantRepository, AdmissionFormClaimantRepository claimantRepository, AdmissionFormDocumentsRepository admissionFormDocumentsRepository, AdmissionFormRepository admissionFormRepository) {
+    public AdmissionFormServiceImpl(EmailService emailService, AdmissionFormUserRepository admissionFormUserRepository, UserService userService, AdmissionFormRespondantRepository respondantRepository, AdmissionFormClaimantRepository claimantRepository, AdmissionFormDocumentsRepository admissionFormDocumentsRepository, AdmissionFormRepository admissionFormRepository) {
         this.emailService = emailService;
+        this.admissionFormUserRepository = admissionFormUserRepository;
+        this.userService = userService;
         this.respondantRepository = respondantRepository;
         this.claimantRepository = claimantRepository;
         this.admissionFormDocumentsRepository = admissionFormDocumentsRepository;
@@ -386,12 +386,32 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
 
         createAdmissionRequestDto.getClaimants().forEach(claimantRequestDto -> {
             AdmissionFormClaimant claimant = mapToClaimantEntity(savedAdmissionForm.getId(),claimantRequestDto);
+            // Add admissionformuser to admissionformuser repository for existing user
+            User user = userService.getUserByUserEmail(claimantRequestDto.getEmail());
+            if(user != null){
+                AdmissionFormUser admissionFormUser = new AdmissionFormUser();
+                admissionFormUser.setAdmissionId(savedAdmissionForm.getId());
+                admissionFormUser.setUserCaseType(UserCaseType.CLAIMANT);
+                admissionFormUser.setUserId(user.getId());
+                admissionFormUserRepository.save(admissionFormUser);
+            }
+
             // Save claimant to database (you'll need a ClaimantRepository for this)
             claimantRepository.saveAndFlush(claimant);
         });
 
         createAdmissionRequestDto.getRespondants().forEach(respondantRequestDto -> {
             AdmissionFormRespondant respondant = mapToRespondantEntity(savedAdmissionForm.getId(),respondantRequestDto);
+            // Add admissionformuser to admissionformuser repository for existing user
+            User user = userService.getUserByUserEmail(respondant.getEmail());
+            if(user != null){
+                AdmissionFormUser admissionFormUser = new AdmissionFormUser();
+                admissionFormUser.setAdmissionId(savedAdmissionForm.getId());
+                admissionFormUser.setUserCaseType(UserCaseType.RESPONDANT);
+                admissionFormUser.setUserId(user.getId());
+                admissionFormUserRepository.save(admissionFormUser);
+            }
+
             // Save claimant to database (you'll need a ClaimantRepository for this)
             respondantRepository.saveAndFlush(respondant);
         });

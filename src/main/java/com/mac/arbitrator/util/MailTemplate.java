@@ -1,5 +1,7 @@
 package com.mac.arbitrator.util;
 
+import com.mac.arbitrator.entity.enums.UserCaseType;
+
 public final class MailTemplate {
     private MailTemplate() {} // prevent instantiation
     public static String generateForgotPasswordOtpEmail(
@@ -246,4 +248,157 @@ public final class MailTemplate {
                 companyName
         );
     }
+
+    public static String generateAdmissionFormPaymentEmail(
+            Long admissionId,
+            String userEmail,
+            UserCaseType partyRole,        // "Claimant" or "Respondent"
+            Float paymentAmount     // e.g. "₹5,000"
+    ) {
+
+        String companyName = "Mac Legal Portal";
+        int year = 2025;
+        String arbitrationLink = "https://app.mac.org.in/webapp/admission/payment/" + admissionId +"/"+ userEmail;
+
+        return """
+       <!DOCTYPE html>
+       <html>
+       <head>
+         <meta charset="UTF-8">
+         <title>Payment Notification</title>
+       </head>
+       <body style="font-family: Arial, sans-serif; background-color: #f6f9fc; padding: 20px; color: #333;">
+         <div style="max-width: 600px; margin: auto; background: #ffffff;
+                     border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                     padding: 30px;">
+
+           <div style="border-bottom: 1px solid #e1e4e8; padding-bottom: 10px; margin-bottom: 20px;">
+             <h2 style="margin: 0;">Payment Notification</h2>
+           </div>
+
+           <p>
+             This is to inform you that a payment has been recorded in the arbitration system.
+           </p>
+
+           <p>
+             <strong>Your Role:</strong> %s<br>
+             <strong>Payment Amount:</strong> %s
+           </p>
+
+           <p>
+             Please click the button below to view the payment details.
+           </p>
+
+           <div style="text-align: center; margin: 25px 0;">
+             <a href="%s"
+                style="display: inline-block; padding: 12px 24px;
+                       background-color: #28a745; color: #ffffff;
+                       text-decoration: none; border-radius: 6px;
+                       font-weight: bold;">
+               View Payment Details
+             </a>
+           </div>
+
+           <p style="margin-top: 30px;">
+             If you have any questions regarding this payment, please contact the arbitration center.
+           </p>
+
+           <p style="margin-top: 20px;">
+             Best regards,<br>
+             <strong>%s</strong>
+           </p>
+
+           <div style="font-size: 12px; color: #999; margin-top: 30px;">
+             &copy; %d %s. All rights reserved.
+           </div>
+
+         </div>
+       </body>
+       </html>
+    """.formatted(
+                partyRole,
+                paymentAmount,
+                arbitrationLink,
+                companyName,
+                year,
+                companyName
+        );
+    }
+
+    public static String generateMediationFormPaymentEmail(
+            Long mediationId,
+            String userEmail,
+            UserCaseType partyRole,        // "Claimant" or "Respondent"
+            Float paymentAmount     // e.g. "₹5,000"
+    ) {
+
+        String companyName = "Mac Legal Portal";
+        int year = 2025;
+        String arbitrationLink = "https://app.mac.org.in/webapp/mediation/payment/" + mediationId +"/"+ userEmail;
+
+        return """
+       <!DOCTYPE html>
+       <html>
+       <head>
+         <meta charset="UTF-8">
+         <title>Payment Notification</title>
+       </head>
+       <body style="font-family: Arial, sans-serif; background-color: #f6f9fc; padding: 20px; color: #333;">
+         <div style="max-width: 600px; margin: auto; background: #ffffff;
+                     border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                     padding: 30px;">
+
+           <div style="border-bottom: 1px solid #e1e4e8; padding-bottom: 10px; margin-bottom: 20px;">
+             <h2 style="margin: 0;">Payment Notification</h2>
+           </div>
+
+           <p>
+             This is to inform you that a payment has been recorded in the arbitration system.
+           </p>
+
+           <p>
+             <strong>Your Role:</strong> %s<br>
+             <strong>Payment Amount:</strong> %s
+           </p>
+
+           <p>
+             Please click the button below to view the payment details.
+           </p>
+
+           <div style="text-align: center; margin: 25px 0;">
+             <a href="%s"
+                style="display: inline-block; padding: 12px 24px;
+                       background-color: #28a745; color: #ffffff;
+                       text-decoration: none; border-radius: 6px;
+                       font-weight: bold;">
+               View Payment Details
+             </a>
+           </div>
+
+           <p style="margin-top: 30px;">
+             If you have any questions regarding this payment, please contact the arbitration center.
+           </p>
+
+           <p style="margin-top: 20px;">
+             Best regards,<br>
+             <strong>%s</strong>
+           </p>
+
+           <div style="font-size: 12px; color: #999; margin-top: 30px;">
+             &copy; %d %s. All rights reserved.
+           </div>
+
+         </div>
+       </body>
+       </html>
+    """.formatted(
+                partyRole,
+                paymentAmount,
+                arbitrationLink,
+                companyName,
+                year,
+                companyName
+        );
+    }
+
 }

@@ -31,7 +31,7 @@ public class JurisdictionController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteJurisdiction(@PathVariable Long id){
-        return  ResponseEntity.ok(id);
+        return  ResponseEntity.ok(jurisdictionService.delete(id));
     }
 
     @GetMapping("/mini")

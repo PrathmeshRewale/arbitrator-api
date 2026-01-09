@@ -48,7 +48,14 @@ public class WebConfig {
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/admission/create").permitAll()
                             .requestMatchers("/api/mediation/create").permitAll()
-                            .requestMatchers("/api/payment/create_link").permitAll()
+                            // ✅ SWAGGER CONFIG
+                            .requestMatchers(
+                                    "/swagger-ui/**",
+                                    "/v3/api-docs/**",
+                                    "/v3/api-docs.yaml",
+                                    "/swagger-resources/**",
+                                    "/webjars/**"
+                            ).permitAll()
                             .anyRequest().authenticated()
                     );
 
