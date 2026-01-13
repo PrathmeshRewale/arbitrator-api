@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface ArbitratorRepository extends JpaRepository<Arbitrator, Long> {
     List<Arbitrator> findByJurisdictionId(Long jurisdictionId);
+    long count();
+    List<Arbitrator> findTop10ByOrderByIdDesc();
+
 }

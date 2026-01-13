@@ -2,6 +2,7 @@ package com.mac.arbitrator.service;
 
 import com.mac.arbitrator.dto.GenericResponseDto;
 import com.mac.arbitrator.dto.request.create.CreateArbitratorRequestDto;
+import com.mac.arbitrator.dto.request.update.UpdateArbitratorPasswordRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdateArbitratorRequestDto;
 import com.mac.arbitrator.dto.response.ArbitratorResponseDto;
 import org.springframework.data.domain.Page;
@@ -15,4 +16,5 @@ public interface ArbitratorService {
     GenericResponseDto delete(Long id);
     GenericResponseDto bulkInsert(List<CreateArbitratorRequestDto> createArbitratorRequestDtos);
     Page<ArbitratorResponseDto> findAll(Pageable pageable);
+    GenericResponseDto resetArbitratorPassword(UpdateArbitratorPasswordRequestDto updateArbitratorPasswordRequestDto);
 }

@@ -21,8 +21,10 @@ public class LegalCaseLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long arbitratorId;
 
+    @Column(nullable = false)
     private String arbitratorName;
 
     @Column(nullable = false)
@@ -37,7 +39,7 @@ public class LegalCaseLog {
     @Column(nullable = false)
     private String purposeOfHearing;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String recordingLink;
 
     @Enumerated(EnumType.STRING)

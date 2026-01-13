@@ -23,9 +23,7 @@ public class PaymentUser {
     @Column(nullable = false)
     private Long paymentId;
 
-    private Long paidById;
-
-    private String paidByName;
+    private String paidByUserEmail;
 
     @Column(nullable = false)
     private String userEmail;
@@ -42,5 +40,6 @@ public class PaymentUser {
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
+    @Enumerated(EnumType.STRING)
     private PaymentMode paymentMode;
 }

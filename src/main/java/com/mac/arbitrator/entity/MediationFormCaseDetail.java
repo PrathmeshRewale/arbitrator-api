@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -22,11 +23,11 @@ public class MediationFormCaseDetail {
     @Column(nullable = false)
     private Long mediationFormId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String recordingLink;
 
     @Column(nullable = false)
-    private LocalDate dateOfHearing;
+    private LocalDateTime dateOfHearing;
 
     @Column(nullable = false)
     private String zoomLink;

@@ -83,19 +83,24 @@ public class DataInitializer implements CommandLineRunner {
         );
     }
 
-    public static Map<String,Object> getAdminPermissions() {
-        return Map.of(
-                "advocates", fullAccess(),
-                "admissions", fullAccess(),
-                "cases", fullAccess(),
-                "jurisdictions",fullAccess(),
-                "dashboard", fullAccess(),
-                "roles", fullAccess(),
-                "users", fullAccess(),
-                "settings",fullAccess(),
-                "payments",fullAccess()
+    public static Map<String, Object> getAdminPermissions() {
+        return Map.ofEntries(
+                Map.entry("arbitrator", fullAccess()),
+                Map.entry("admissions", fullAccess()),
+                Map.entry("cases", fullAccess()),
+                Map.entry("jurisdictions", fullAccess()),
+                Map.entry("partytype", fullAccess()),
+                Map.entry("city", fullAccess()),
+                Map.entry("country", fullAccess()),
+                Map.entry("state", fullAccess()),
+                Map.entry("dashboard", fullAccess()),
+                Map.entry("roles", fullAccess()),
+                Map.entry("users", fullAccess()),
+                Map.entry("settings", fullAccess()),
+                Map.entry("payments", fullAccess())
         );
     }
+
     public static Map<String, Object> getUserPermission() {
         return Map.of(
                 "cases", fullAccess(),

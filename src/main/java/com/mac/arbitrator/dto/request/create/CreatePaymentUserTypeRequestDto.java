@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class CreatePaymentUserTypeRequestDto {
     private Long paymentId;
-    private Long paidById;
-    private String paidByName;
+    private String userEmail;
+    private String paidByUserEmail;
     private Float amount;
     private String transactionId;
     private PaymentMode paymentMode;

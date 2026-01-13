@@ -1,6 +1,7 @@
 package com.mac.arbitrator.controller;
 
 import com.mac.arbitrator.dto.request.create.CreateArbitratorRequestDto;
+import com.mac.arbitrator.dto.request.update.UpdateArbitratorPasswordRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdateArbitratorRequestDto;
 import com.mac.arbitrator.dto.response.ArbitratorResponseDto;
 import com.mac.arbitrator.service.ArbitratorService;
@@ -34,6 +35,12 @@ public class ArbitratorController {
             @PathVariable Long id,
             @RequestBody UpdateArbitratorRequestDto updateArbitratorRequestDto) {
         return ResponseEntity.ok(arbitratorService.update(id, updateArbitratorRequestDto));
+    }
+
+    @PutMapping("/update/password")
+    public ResponseEntity<?> updateArbitrator(
+            @RequestBody UpdateArbitratorPasswordRequestDto updateArbitratorPasswordRequestDto) {
+        return ResponseEntity.ok(arbitratorService.resetArbitratorPassword(updateArbitratorPasswordRequestDto));
     }
 
     @DeleteMapping("/delete/{id}")

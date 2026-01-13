@@ -58,6 +58,7 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
 
             AdmissionResponseDto dto = new AdmissionResponseDto();
             dto.setId(admissionForm.getId());
+            dto.setAdmissionFromNo(admissionForm.getAdmissionFormNo());
             dto.setArbitrationClause(admissionForm.getArbitrationClause());
             dto.setDisputeAmount(admissionForm.getDisputeAmount());
             dto.setDisputeDate(admissionForm.getDisputeDate());
@@ -166,6 +167,7 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
 
             AdmissionResponseDto dto = new AdmissionResponseDto();
             dto.setId(admissionForm.getId());
+            dto.setAdmissionFromNo(admissionForm.getAdmissionFormNo());
             dto.setArbitrationClause(admissionForm.getArbitrationClause());
             dto.setDisputeAmount(admissionForm.getDisputeAmount());
             dto.setDisputeDate(admissionForm.getDisputeDate());
@@ -286,6 +288,7 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
         dto.setJurisdictionName(admissionForm.getJurisdictionName());
         dto.setRefiefSought(admissionForm.getReliefSought());
         dto.setStatus(admissionForm.getStatus().name());
+        dto.setCreatedAt(admissionForm.getCreatedAt());
 
         /* -------------------- CLAIMANTS -------------------- */
         List<ClaimantResponseDto> claimantDtos =
@@ -421,6 +424,7 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
         admissionFormDocumentsRepository.saveAndFlush(admissionFormDocuments);
 
         String adminEmail = emailService.getAdminReceiverEmail();
+        System.out.println(adminEmail);
         CreateEmailRequestDto createEmailRequestDto = new CreateEmailRequestDto();
         String messageBody = MailTemplate.generateAdmissionAdminEmail(savedAdmissionForm.getId());
         createEmailRequestDto.setMsgBody(messageBody);

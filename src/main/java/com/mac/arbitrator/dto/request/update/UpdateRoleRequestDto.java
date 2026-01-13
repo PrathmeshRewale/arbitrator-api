@@ -15,5 +15,4 @@ public class UpdateRoleRequestDto {
     private Map<String ,Object> permissions;
     private Long updatedById;
     private String updatedByName;
-    private Instant updatedAt;
 }

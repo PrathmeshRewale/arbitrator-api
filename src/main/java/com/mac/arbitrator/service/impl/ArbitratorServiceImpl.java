@@ -2,6 +2,7 @@ package com.mac.arbitrator.service.impl;
 
 import com.mac.arbitrator.dto.GenericResponseDto;
 import com.mac.arbitrator.dto.request.create.CreateArbitratorRequestDto;
+import com.mac.arbitrator.dto.request.update.UpdateArbitratorPasswordRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdateArbitratorRequestDto;
 import com.mac.arbitrator.dto.response.ArbitratorResponseDto;
 import com.mac.arbitrator.entity.Arbitrator;
@@ -82,7 +83,9 @@ public class ArbitratorServiceImpl implements ArbitratorService {
     @Override
     public GenericResponseDto update(Long id, UpdateArbitratorRequestDto req) {
 
-        Arbitrator arbitrator = arbitratorRepository.findById(id).orElseThrow(()->new RuntimeException("Arbitrator with id -> " + id + " not found"));
+        Arbitrator arbitrator = arbitratorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Arbitrator with id -> " + id + " not found"));
+
         arbitrator.setEmail(req.getEmail());
         arbitrator.setGender(req.getGender());
         arbitrator.setFullName(req.getFullName());
@@ -95,10 +98,26 @@ public class ArbitratorServiceImpl implements ArbitratorService {
         arbitrator.setUpdatedById(req.getUpdatedById());
         arbitrator.setUpdatedAt(Instant.now());
 
-        Arbitrator arbitrator1 = arbitratorRepository.save(arbitrator);
+        arbitratorRepository.save(arbitrator);
 
-        return new GenericResponseDto("success","record updated successfully");
+        // 🔁 Sync with User table
+        ArbitratorUser arbitratorUser = arbitratorUserRepository
+                .findByArbitratorId(id)
+                .orElseThrow(() -> new RuntimeException("ArbitratorUser mapping not found"));
+
+        User user = userRepository.findById(arbitratorUser.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setEmail(req.getEmail());
+        user.setPhoneNo(req.getPhoneNumber());
+        user.setFullName(req.getFullName());
+        user.setUsername(req.getEmail().split("@")[0]);
+
+        userRepository.save(user);
+
+        return new GenericResponseDto("success", "record updated successfully");
     }
+
 
     @Override
     public GenericResponseDto delete(Long id) {
@@ -153,6 +172,21 @@ public class ArbitratorServiceImpl implements ArbitratorService {
     public Page<ArbitratorResponseDto> findAll(Pageable pageable) {
         return arbitratorRepository.findAll(pageable)
                 .map(this::mapToResponseDto);
+    }
+
+
+    @Override
+    public GenericResponseDto resetArbitratorPassword(UpdateArbitratorPasswordRequestDto updateArbitratorPasswordRequestDto) {
+
+        ArbitratorUser arbitratorUser = arbitratorUserRepository.findByArbitratorId(updateArbitratorPasswordRequestDto.getArbitratorId()).orElseThrow(()->new RuntimeException("Arbitrator user with id -> " + updateArbitratorPasswordRequestDto.getArbitratorId() + " not found"));
+
+        User user = userRepository.findById(arbitratorUser.getUserId()).orElseThrow(()->new RuntimeException("User with id -> "+arbitratorUser.getUserId()+" not found"));
+
+        user.setPassword(passwordEncoder.encode(updateArbitratorPasswordRequestDto.getNewPassword()));
+
+        userRepository.save(user);
+
+        return null;
     }
 
     private ArbitratorResponseDto mapToResponseDto(Arbitrator arbitrator) {

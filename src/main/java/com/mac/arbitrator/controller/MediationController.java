@@ -10,7 +10,9 @@
 package com.mac.arbitrator.controller;
 
 import com.mac.arbitrator.dto.GenericResponseDto;
+import com.mac.arbitrator.dto.request.create.CreateMediationFormCaseDetailRequestDto;
 import com.mac.arbitrator.dto.request.create.CreateMediationRequestDto;
+import com.mac.arbitrator.dto.request.update.UpdateMediationFormCaseDetailRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdateMediationFormStatus;
 import com.mac.arbitrator.dto.response.MediationResponseDto;
 import com.mac.arbitrator.service.MediationFormService;
@@ -69,5 +71,19 @@ public class MediationController {
         return new ResponseEntity<>(mediationFormService.deleteMediation(id), HttpStatus.OK);
     }
 
+    @PostMapping("/add_case_detail")
+    public ResponseEntity<?> createMediationFOrmCaseDetail(@RequestBody CreateMediationFormCaseDetailRequestDto createMediationFormCaseDetailRequestDto){
+        return ResponseEntity.ok(mediationFormService.createMediationCaseDetail(createMediationFormCaseDetailRequestDto));
+    }
+
+    @PutMapping("/update_case_detail")
+    public ResponseEntity<?> updateMediationFormCaseDetail(@RequestBody UpdateMediationFormCaseDetailRequestDto updateMediationFormCaseDetailRequestDto){
+        return ResponseEntity.ok(mediationFormService.updateMediationCaseDetail(updateMediationFormCaseDetailRequestDto));
+    }
+
+    @GetMapping("/check_meetlink_exist/{mediationId}")
+    public ResponseEntity<?> checkIfMeetLinkAlreadyExist(@PathVariable Long mediationId){
+        return ResponseEntity.ok(mediationFormService.checkIfMeetLinkAlreadyExist(mediationId));
+    }
 
 }

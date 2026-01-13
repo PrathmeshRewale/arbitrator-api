@@ -14,6 +14,7 @@ public class LoginResponseDto {
     private String refreshToken;
     private String username;
     private Long userId;
+    private Long arbitratorId;
     private String userEmail;
     private Long roleId;
     private String roleName;

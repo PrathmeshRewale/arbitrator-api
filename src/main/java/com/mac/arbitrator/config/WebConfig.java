@@ -5,6 +5,7 @@ import com.mac.arbitrator.security.CustomAuthenticationEntryPoint;
 import com.mac.arbitrator.security.CustomAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -45,9 +51,22 @@ public class WebConfig {
                     )
                     // Configure endpoint access
                     .authorizeHttpRequests(auth -> auth
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/admission/create").permitAll()
                             .requestMatchers("/api/mediation/create").permitAll()
+                            .requestMatchers("/api/city/mini").permitAll()
+                            .requestMatchers("/api/city/mini/**").permitAll()
+                            .requestMatchers("/api/country/mini").permitAll()
+                            .requestMatchers("/api/country/mini/**").permitAll()
+                            .requestMatchers("/api/state/mini").permitAll()
+                            .requestMatchers("/api/state/mini/**").permitAll()
+                            .requestMatchers("/api/jurisdiction/mini").permitAll()
+                            .requestMatchers("/api/jurisdiction/mini/**").permitAll()
+                            .requestMatchers("/api/partytype/mini").permitAll()
+                            .requestMatchers("/api/partytype/mini/**").permitAll()
+                            .requestMatchers("/api/payment/**").permitAll()
+
                             // ✅ SWAGGER CONFIG
                             .requestMatchers(
                                     "/swagger-ui/**",
@@ -67,6 +86,19 @@ public class WebConfig {
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8080"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean

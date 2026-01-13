@@ -15,6 +15,8 @@ public class MediationResponseDto {
 
     private Long id;
 
+    private String mediationFromNo;
+
     private String defaultClause;
 
     private Long jurisdictionId;

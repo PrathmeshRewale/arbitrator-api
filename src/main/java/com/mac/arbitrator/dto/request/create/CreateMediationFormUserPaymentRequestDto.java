@@ -17,7 +17,7 @@ public class CreateMediationFormUserPaymentRequestDto {
     private FormStatus status;
     private Float amount;
     private Float remainingAmount;
-    List<MediationFormUserAmountDetails> admissionFormUserAmountDetails;
+    List<MediationFormUserAmountDetails> mediationFormUserAmountDetails;
     private LocalDate createdAt;
 
     @Data
