@@ -1,6 +1,7 @@
 package com.mac.arbitrator.repository;
 
 import com.mac.arbitrator.entity.AdmissionFormClaimant;
+import com.mac.arbitrator.entity.MediationFormClaimant;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

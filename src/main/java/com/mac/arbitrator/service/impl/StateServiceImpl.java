@@ -73,6 +73,11 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
+    public List<StateMiniResponseDto> getAllStateMiniByCountryId(Long countryId) {
+        return stateRepository.findAllByCountryId(countryId).stream().map(obj->new StateMiniResponseDto(obj.getId(), obj.getName())).toList();
+    }
+
+    @Override
     public StateResponseDto getStateById(Long id) {
         State state = stateRepository.findById(id).orElseThrow(()->new RuntimeException("record with id not found"));
         return mapToDto(state);

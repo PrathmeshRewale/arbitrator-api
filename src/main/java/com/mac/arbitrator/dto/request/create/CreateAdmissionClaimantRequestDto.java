@@ -14,7 +14,7 @@ public class CreateAdmissionClaimantRequestDto {
 
     private Long partyTypeId;
 
-    private String partyTypeName;
+        private String partyTypeName;
 
     private String email;
 

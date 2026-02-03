@@ -1,6 +1,7 @@
 package com.mac.arbitrator.security;
 
 import com.mac.arbitrator.entity.User;
+import com.mac.arbitrator.repository.UserRepository;
 import com.mac.arbitrator.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,16 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomUserDetailService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public CustomUserDetailService(UserService userService) {
-        this.userService = userService;
+    public CustomUserDetailService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(()->new RuntimeException("User with username -> " + username + " not fount from spring security context"));
         return new CustomUserDetail(user);
     }
 }

@@ -70,6 +70,11 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    public List<CityMiniResponseDto> getAllCityMiniByStateId(Long stateId) {
+        return cityRepository.findAllByStateId(stateId).stream().map(obj->new CityMiniResponseDto(obj.getId(), obj.getName())).toList();
+    }
+
+    @Override
     public CityResponseDto getCityById(Long id) {
         City city = cityRepository.findById(id).orElseThrow(()->new RuntimeException("record with id not found"));
         return mapToDto(city);

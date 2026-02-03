@@ -19,4 +19,5 @@ public interface CityService {
     Boolean checkAvailability(String name);
     void deleteByStateId(Long stateId);
     void deleteByCountryId(Long countryId);
+    List<CityMiniResponseDto> getAllCityMiniByStateId(Long stateId);
 }

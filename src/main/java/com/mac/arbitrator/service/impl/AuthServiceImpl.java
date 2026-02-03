@@ -4,17 +4,19 @@ import com.mac.arbitrator.dto.GenericResponseDto;
 import com.mac.arbitrator.dto.request.ForgotPasswordRequestDto;
 import com.mac.arbitrator.dto.request.LoginRequestRequestDto;
 import com.mac.arbitrator.dto.request.VerifyOtpRequestDto;
+import com.mac.arbitrator.dto.request.create.CreateAdmissionFormUserRequestDto;
 import com.mac.arbitrator.dto.request.create.CreateEmailRequestDto;
+import com.mac.arbitrator.dto.request.create.CreateUserRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdatedUserPasswordRequestDto;
 import com.mac.arbitrator.dto.response.LoginResponseDto;
-import com.mac.arbitrator.entity.Role;
-import com.mac.arbitrator.entity.User;
-import com.mac.arbitrator.entity.UserOtp;
-import com.mac.arbitrator.repository.UserOtpRepository;
-import com.mac.arbitrator.repository.UserRepository;
+import com.mac.arbitrator.entity.*;
+import com.mac.arbitrator.entity.enums.UserCaseType;
+import com.mac.arbitrator.repository.*;
 import com.mac.arbitrator.service.AuthService;
 import com.mac.arbitrator.service.EmailService;
 import com.mac.arbitrator.service.RoleService;
+import com.mac.arbitrator.repository.UserRepository;
+import com.mac.arbitrator.service.UserService;
 import com.mac.arbitrator.util.JwtUtil;
 import com.mac.arbitrator.util.MailTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -37,8 +41,12 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+    private final AdmissionFormClaimantRepository admissionFormClaimantRepository;
+    private final AdmissionFormRespondantRepository admissionFormRespondantRepository;
+    private final AdmissionFormUserRepository admissionFormUserRepository;
+    private final ArbitratorUserRepository arbitratorUserRepository;
 
-    public AuthServiceImpl(UserRepository userRepository, UserOtpRepository userOtpRepository, AuthenticationManager authenticationManager, EmailService emailService, JwtUtil jwtUtil, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository, UserOtpRepository userOtpRepository, AuthenticationManager authenticationManager, EmailService emailService, JwtUtil jwtUtil, RoleService roleService, PasswordEncoder passwordEncoder, AdmissionFormClaimantRepository admissionFormClaimantRepository, AdmissionFormRespondantRepository admissionFormRespondantRepository, AdmissionFormUserRepository admissionFormUserRepository, ArbitratorUserRepository arbitratorUserRepository) {
         this.userRepository = userRepository;
         this.userOtpRepository = userOtpRepository;
         this.authenticationManager = authenticationManager;
@@ -46,6 +54,10 @@ public class AuthServiceImpl implements AuthService {
         this.jwtUtil = jwtUtil;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
+        this.admissionFormClaimantRepository = admissionFormClaimantRepository;
+        this.admissionFormRespondantRepository = admissionFormRespondantRepository;
+        this.admissionFormUserRepository = admissionFormUserRepository;
+        this.arbitratorUserRepository = arbitratorUserRepository;
     }
 
     private static final long OTP_EXPIRY_DURATION_MS = 10 * 60 * 1000;
@@ -53,126 +65,219 @@ public class AuthServiceImpl implements AuthService {
     private static final String OTP_CHARACTERS = "0123456789";
 
 
-
     @Override
-    public GenericResponseDto login(LoginRequestRequestDto loginRequestRequestDto) {
-        try {
-            Authentication authentication =
-                    authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    loginRequestRequestDto.getUsername(),
-                                    loginRequestRequestDto.getPassword()
-                            )
-                    );
-
-            String username = authentication.getName();
-
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            int otp = generateAndSaveOtp(user.getId());
-
-            CreateEmailRequestDto createEmailRequestDto = new CreateEmailRequestDto();
-
-            String messageBody = MailTemplate.generateLoginOtpEmail(user.getFullName(),otp);
-
-            createEmailRequestDto.setRecipient(user.getEmail());
-            createEmailRequestDto.setMsgBody(messageBody);
-
-            emailService.sendSystemMail(createEmailRequestDto);
-
-            return new GenericResponseDto("susses","Otp sent");
-
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid username or password");
+    public GenericResponseDto registerAdmissionFormUser(CreateAdmissionFormUserRequestDto req) {
+        //existing user id user mail already existed
+        User user1 = userRepository.findByUsernameOrEmail("",req.getUserEmail());
+        if(user1 != null){
+            return new GenericResponseDto(
+                    "error",
+                    "User with email already existed"
+            );
         }
+
+        List<AdmissionFormClaimant> admissionFormClaimants =
+                admissionFormClaimantRepository.findByAdmissionFormId(req.getAdmissionId());
+
+        List<AdmissionFormRespondant> admissionFormRespondants =
+                admissionFormRespondantRepository.findByAdmissionFormId(req.getAdmissionId());
+
+        UserCaseType userType = null;
+        String secondaryEmail = null;
+
+        // Check in claimants
+        for (AdmissionFormClaimant claimant : admissionFormClaimants) {
+            if (claimant.getEmail().equalsIgnoreCase(req.getUserEmail())) {
+                userType = UserCaseType.CLAIMANT;
+                secondaryEmail = claimant.getSecondaryEmail();
+                break;
+            }
+        }
+
+        // If not claimant, check in respondents
+        if (userType == null) {
+            for (AdmissionFormRespondant respondent : admissionFormRespondants) {
+                if (respondent.getEmail().equalsIgnoreCase(req.getUserEmail())) {
+                    userType = UserCaseType.RESPONDANT;
+                    secondaryEmail = respondent.getSecondaryEmail();
+                    break;
+                }
+            }
+        }
+
+        // If user is neither claimant nor respondent
+        if (userType == null) {
+            return new GenericResponseDto(
+                    "error",
+                    "You're not associated with this admission form"
+            );
+        }
+
+        // Assign role based on user type
+        Role role = roleService.getRoleByName("USER");
+
+        User createUserRequestDto = new User();
+        createUserRequestDto.setEmail(req.getUserEmail());
+        createUserRequestDto.setPassword(passwordEncoder.encode(req.getPassword()));
+        createUserRequestDto.setAlternativeEmail(secondaryEmail);
+        createUserRequestDto.setPhoneNo(req.getPhoneNo());
+        createUserRequestDto.setFullName(req.getFullName());
+        createUserRequestDto.setUsername(req.getUsername());
+        createUserRequestDto.setRoleId(role.getId());
+        createUserRequestDto.setRoleName(role.getName());
+
+        User user = userRepository.save(createUserRequestDto);
+
+        AdmissionFormUser admissionFormUser = new AdmissionFormUser();
+        admissionFormUser.setAdmissionId(req.getAdmissionId());
+        admissionFormUser.setUserId(user.getId());
+        admissionFormUser.setUserCaseType(userType);
+
+        admissionFormUserRepository.save(admissionFormUser);
+
+        return new GenericResponseDto("success","record added successfully");
     }
 
+    // ---------------- LOGIN ----------------
+
     @Override
-    public LoginResponseDto verifyLoginOtp(VerifyOtpRequestDto verifyLoginOtp) {
-        User user = userRepository.findByUsername(verifyLoginOtp.getUsername()).orElseThrow(()->new RuntimeException("User not fount"));
-        UserOtp userOtp = userOtpRepository.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("User not found in te otp"));
+    public GenericResponseDto login(LoginRequestRequestDto dto) {
 
-        if(userOtp.getOtp() != verifyLoginOtp.getOtp()){
-            throw new RuntimeException("Invalid Otp");
-        }
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
+                );
 
-        if(userOtp.getExpired().isAfter(Instant.now().plusMillis(OTP_EXPIRY_DURATION_MS))){
-            throw new RuntimeException("Otp expired");
-        }
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        int otp = generateAndSaveOtp(user.getId());
+
+        emailService.sendSystemMail(
+                new CreateEmailRequestDto(user.getEmail(),
+                        MailTemplate.generateLoginOtpEmail(user.getFullName(), otp))
+        );
+
+        return new GenericResponseDto("success", "OTP sent");
+    }
+
+    // ---------------- VERIFY LOGIN OTP ----------------
+
+    @Override
+    public LoginResponseDto verifyLoginOtp(VerifyOtpRequestDto dto) {
+
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserOtp otp = userOtpRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("OTP not found"));
+
+        if (!otp.getOtp().equals(dto.getOtp()))
+            throw new RuntimeException("Invalid OTP");
+
+        if (otp.getExpired().isBefore(Instant.now()))
+            throw new RuntimeException("OTP expired");
 
         userOtpRepository.deleteByUserId(user.getId());
 
+        ArbitratorUser arbitratorUser = arbitratorUserRepository
+                .findByUserId(user.getId())
+                .orElse(null);
+
         String accessToken = jwtUtil.generateAccessToken(user.getUsername());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
-
         Role role = roleService.getById(user.getRoleId());
 
-        LoginResponseDto loginResponseDto = new LoginResponseDto();
+        LoginResponseDto res = new LoginResponseDto();
+        res.setUserId(user.getId());
+        res.setUserEmail(user.getEmail());
+        res.setUsername(user.getUsername());
+        if(arbitratorUser != null) {
+            res.setArbitratorId(arbitratorUser.getArbitratorId());
+        }
+        if(arbitratorUser == null){
+            res.setArbitratorId(0l);
+        }
+        res.setRoleId(user.getRoleId());
+        res.setRoleName(user.getRoleName());
+        res.setPermissions(role.getPermissions());
+        res.setAccessToken(accessToken);
+        res.setRefreshToken(refreshToken);
 
-        loginResponseDto.setUserId(user.getId());
-        loginResponseDto.setUserEmail(user.getEmail());
-        loginResponseDto.setUsername(user.getUsername());
-        loginResponseDto.setRoleName(user.getRoleName());
-        loginResponseDto.setRoleId(user.getRoleId());
-        loginResponseDto.setPermissions(role.getPermissions());
-        loginResponseDto.setRefreshToken(refreshToken);
-        loginResponseDto.setAccessToken(accessToken);
-
-        return loginResponseDto;
+        return res;
     }
 
+    // ---------------- FORGOT PASSWORD ----------------
+
     @Override
-    public GenericResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) {
-        User user = userRepository.findByUsernameOrEmail(forgotPasswordRequestDto.getUsername(),forgotPasswordRequestDto.getUserEmail());
+    public GenericResponseDto forgotPassword(ForgotPasswordRequestDto dto) {
 
-        Integer otp = generateAndSaveOtp(user.getId());
+        User user = userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getUserEmail());
 
-        CreateEmailRequestDto createEmailRequestDto = new CreateEmailRequestDto();
+        System.out.println(user);
 
-        String messagebody = MailTemplate.generateForgotPasswordOtpEmail(user.getFullName(),otp);
+        if (user == null)
+            throw new RuntimeException("User not found");
 
-        createEmailRequestDto.setRecipient(user.getEmail());
-        createEmailRequestDto.setMsgBody(messagebody);
+        int otp = generateAndSaveOtp(user.getId());
 
-        emailService.sendSystemMail(createEmailRequestDto);
-        return new GenericResponseDto("success","Otp sent");
+        emailService.sendSystemMail(
+                new CreateEmailRequestDto(user.getEmail(),
+                        MailTemplate.generateForgotPasswordOtpEmail(user.getFullName(), otp))
+        );
+
+        return new GenericResponseDto("success", "OTP sent");
     }
 
+    // ---------------- VERIFY FORGOT OTP ----------------
+
     @Override
-    public GenericResponseDto verifyForgotPasswordOtp(VerifyOtpRequestDto verifyOtpRequestDto) {
-        User user = userRepository.findByUsernameOrEmail(verifyOtpRequestDto.getUsername(),verifyOtpRequestDto.getUserEmail());
-        UserOtp userOtp = userOtpRepository.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("User not found in te otp"));
+    public GenericResponseDto verifyForgotPasswordOtp(VerifyOtpRequestDto dto) {
 
-        if(userOtp.getOtp() != verifyOtpRequestDto.getOtp()){
-            throw new RuntimeException("Invalid Otp");
-        }
+        User user = userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getUserEmail());
 
-        if(userOtp.getExpired().isAfter(Instant.now().plusMillis(OTP_EXPIRY_DURATION_MS))){
-            throw new RuntimeException("Otp expired");
-        }
+        if (user == null)
+            throw new RuntimeException("User not found");
 
-        userOtp.setIsVerified(true);
+        UserOtp otp = userOtpRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("OTP not found"));
 
-        userOtpRepository.save(userOtp);
+        if (!otp.getOtp().equals(dto.getOtp()))
+            throw new RuntimeException("Invalid OTP");
 
-        return new GenericResponseDto("success","Otp Verified");
+        if (otp.getExpired().isBefore(Instant.now()))
+            throw new RuntimeException("OTP expired");
+
+        otp.setIsVerified(true);
+        userOtpRepository.save(otp);
+
+        return new GenericResponseDto("success", "OTP verified");
     }
 
+    // ---------------- UPDATE PASSWORD ----------------
+
     @Override
-    public GenericResponseDto updateUserPassword(UpdatedUserPasswordRequestDto updatedUserPasswordRequestDto) {
-        User user = userRepository.findByUsernameOrEmail(updatedUserPasswordRequestDto.getUsername(),updatedUserPasswordRequestDto.getUserEmail());
-        UserOtp userOtp = userOtpRepository.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("User not found in te otp"));
+    public GenericResponseDto updateUserPassword(UpdatedUserPasswordRequestDto dto) {
 
-        if(!userOtp.getIsVerified()){
-            throw new RuntimeException("Otp not verified");
-        }
+        User user = userRepository.findByUsernameOrEmail(dto.getUsername(), dto.getUserEmail());
 
-        user.setPassword(passwordEncoder.encode(updatedUserPasswordRequestDto.getNewPassword()));
+        if (user == null)
+            throw new RuntimeException("User not found");
+
+        UserOtp otp = userOtpRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("OTP not found"));
+
+        if (!otp.getIsVerified())
+            throw new RuntimeException("OTP not verified");
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
+        userOtpRepository.deleteByUserId(user.getId());
 
-        return new GenericResponseDto("success","Password updated successfully");
+        return new GenericResponseDto("success", "Password updated");
     }
+
+    // ---------------- OTP GENERATION ----------------
 
     @Transactional
     public int generateAndSaveOtp(Long userId){
@@ -188,12 +293,9 @@ public class AuthServiceImpl implements AuthService {
 
     private int generateNumericOtp(int length) {
         SecureRandom random = new SecureRandom();
-        StringBuilder otpBuilder = new StringBuilder(length);
-
-        for (int i = 0; i < length; i++) {
-            otpBuilder.append(OTP_CHARACTERS.charAt(random.nextInt(OTP_CHARACTERS.length())));
-        }
-
-        return Integer.parseInt(otpBuilder.toString());
+        int min = (int) Math.pow(10, length - 1); // 100000
+        int max = (int) Math.pow(10, length) - 1; // 999999
+        return random.nextInt(max - min + 1) + min;
     }
+
 }

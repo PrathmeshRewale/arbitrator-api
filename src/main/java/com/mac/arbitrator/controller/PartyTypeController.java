@@ -31,7 +31,7 @@ public class PartyTypeController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deletePartyType(@PathVariable Long id){
-        return  ResponseEntity.ok(id);
+        return  ResponseEntity.ok(partyTypeService.delete(id));
     }
 
     @GetMapping("/mini")

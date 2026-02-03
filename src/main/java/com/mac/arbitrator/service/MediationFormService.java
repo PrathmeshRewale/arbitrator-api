@@ -1,7 +1,9 @@
 package com.mac.arbitrator.service;
 
 import com.mac.arbitrator.dto.GenericResponseDto;
+import com.mac.arbitrator.dto.request.create.CreateMediationFormCaseDetailRequestDto;
 import com.mac.arbitrator.dto.request.create.CreateMediationRequestDto;
+import com.mac.arbitrator.dto.request.update.UpdateMediationFormCaseDetailRequestDto;
 import com.mac.arbitrator.dto.request.update.UpdateMediationFormStatus;
 import com.mac.arbitrator.dto.response.AdmissionResponseDto;
 import com.mac.arbitrator.dto.response.MediationResponseDto;
@@ -12,11 +14,10 @@ import java.util.List;
 public interface MediationFormService {
     Page<MediationResponseDto> getAllMediations(int page, int size);
     List<MediationResponseDto> getAllMediations();
-
     MediationResponseDto getMediationById(Long id);
-
     GenericResponseDto createMediation(CreateMediationRequestDto createMediationRequestDto);
-
     GenericResponseDto deleteMediation(Long id);
-
+    GenericResponseDto createMediationCaseDetail(CreateMediationFormCaseDetailRequestDto createMediationFormCaseDetailRequestDto);
+    GenericResponseDto updateMediationCaseDetail(UpdateMediationFormCaseDetailRequestDto updateMediationFormCaseDetailRequestDto);
+    GenericResponseDto checkIfMeetLinkAlreadyExist(Long mediationId);
 }

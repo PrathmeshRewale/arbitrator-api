@@ -17,7 +17,7 @@ public class MediationFormRespondant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "admission_form_id", nullable = false)
+    @Column(name = "mediation_form_id", nullable = false)
     private Long mediationFormId;
 
     @Column(name = "full_name", nullable = false)

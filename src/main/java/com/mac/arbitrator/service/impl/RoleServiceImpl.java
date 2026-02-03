@@ -6,6 +6,7 @@ import com.mac.arbitrator.entity.Role;
 import com.mac.arbitrator.repository.RoleRepository;
 import com.mac.arbitrator.service.RoleService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,6 +21,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional
     public GenericResponseDto updatedRole(Long id, UpdateRoleRequestDto req) {
 
         Role role = getById(id);
@@ -31,7 +33,8 @@ public class RoleServiceImpl implements RoleService {
         role.setDescription(req.getDescription());
         role.setPermissions(req.getPermissions());
 
-        return roleRepository.save(role).getId() != null ? new GenericResponseDto("success","role updated successfully") : new GenericResponseDto("error","Something went wrong");
+        roleRepository.save(role);
+        return new GenericResponseDto("success","Role updated successfully");
 
     }
 
@@ -48,5 +51,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void deleteById(Long id) {
         roleRepository.deleteById(id);
+    }
+
+    @Override
+    public Role getRoleByName(String name) {
+        return roleRepository.findByName(name).orElseThrow(()-> new RuntimeException("Role with name -> " + name + " not found"));
     }
 }

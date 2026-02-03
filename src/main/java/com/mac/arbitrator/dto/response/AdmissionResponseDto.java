@@ -14,6 +14,8 @@ public class AdmissionResponseDto {
 
     private Long id;
 
+    private String admissionFromNo;
+
     private String defaultClause;
 
     private Long jurisdictionId;

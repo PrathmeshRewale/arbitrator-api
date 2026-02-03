@@ -1,5 +1,6 @@
 package com.mac.arbitrator.entity;
 
+import com.mac.arbitrator.entity.enums.HearingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,4 +26,6 @@ public class ArbitratorLegalCase {
     private Long arbitratorId;
 
     private String claimantEmail;
+
+    private HearingStatus status;
 }
