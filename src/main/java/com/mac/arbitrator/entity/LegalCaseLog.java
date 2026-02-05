@@ -39,6 +39,9 @@ public class LegalCaseLog {
     @Column(nullable = false)
     private String purposeOfHearing;
 
+    @Column(nullable = false)
+    private String awardStatement;
+
     @Column(nullable = true)
     private String recordingLink;
 

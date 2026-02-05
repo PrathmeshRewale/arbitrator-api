@@ -20,6 +20,7 @@ public class LegalCaseLogResponseDto {
     private LocalDate lastHearingDate;
     private LocalDate nextHearingDate;
     private String purposeOfHearing;
+    private String awardStatement;
     private String recordingLink;
     private HearingStatus status;
     private Instant createdAt;

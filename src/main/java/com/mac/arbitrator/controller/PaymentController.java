@@ -18,7 +18,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @Value("${razorpay.key_secret}")  // ✅ correct
+    @Value("${razorpay.key_secret}")
     private String keySecret;
 
     public PaymentController(PaymentService paymentService) {

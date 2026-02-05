@@ -134,6 +134,7 @@ public class LegalCaseServiceImpl implements LegalCaseService {
         legalCaseLog.setLastHearingDate(createLegalCaseLogRequestDto.getLastHearingDate());
         legalCaseLog.setNextHearingDate(createLegalCaseLogRequestDto.getNextHearingDate());
         legalCaseLog.setPurposeOfHearing(createLegalCaseLogRequestDto.getPurposeOfHearing());
+        legalCaseLog.setAwardStatement(createLegalCaseLogRequestDto.getAwardStatement());
 
         LegalCaseLog legalCaseLog1 = legalCaseLogRepository.save(legalCaseLog);
 
@@ -511,6 +512,7 @@ public class LegalCaseServiceImpl implements LegalCaseService {
             req.setLastHearingDate(obj.getLastHearingDate());
             req.setNextHearingDate(obj.getNextHearingDate());
             req.setPurposeOfHearing(obj.getPurposeOfHearing());
+            req.setAwardStatement(obj.getAwardStatement());
             req.setCreatedById(obj.getCreatedById());
             req.setCreatedByName(obj.getCreatedByName());
             res.add(req);
