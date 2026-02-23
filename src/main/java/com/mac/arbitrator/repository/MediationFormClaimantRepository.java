@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface MediationFormClaimantRepository extends JpaRepository<MediationFormClaimant, Long> {
 
-    @Query(value = "SELECT * FROM mediation_form_claimant WHERE admission_form_id = :id", nativeQuery = true)
+    @Query(value = "SELECT * FROM mediation_form_claimant WHERE mediation_form_id = :id", nativeQuery = true)
     List<MediationFormClaimant> findByMediationFormId(long id);
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM mediation_form_claimant WHERE admission_form_id = :id", nativeQuery = true)
+    @Query(value = "DELETE FROM mediation_form_claimant WHERE mediation_form_id = :id", nativeQuery = true)
     void deletebyMediationFormId(long id);
 }

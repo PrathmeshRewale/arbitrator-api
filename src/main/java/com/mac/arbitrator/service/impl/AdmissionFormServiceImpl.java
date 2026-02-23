@@ -438,6 +438,9 @@ public class AdmissionFormServiceImpl implements AdmissionFormService {
     public GenericResponseDto deleteAdmission(Long id) {
 
         if(admissionFormRepository.findById(id).isPresent()){
+            claimantRepository.deletebyAdmissionFormId(id);
+            respondantRepository.deletebyAdmissionFormId(id);
+            admissionFormDocumentsRepository.deletebyAdmissionFormId(id);
             admissionFormRepository.deleteById(id);
             return new GenericResponseDto("success","Admission Deleted");
         }

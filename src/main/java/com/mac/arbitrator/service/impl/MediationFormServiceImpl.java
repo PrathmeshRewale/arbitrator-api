@@ -414,6 +414,9 @@ public class MediationFormServiceImpl implements MediationFormService {
     public GenericResponseDto deleteMediation(Long id) {
 
         if(mediaitonFormRepository.findById(id).isPresent()){
+            claimantRepository.deletebyMediationFormId(id);
+            respondantRepository.deletebyMediationFormId(id);
+            mediaitonFormDocumentsRepository.deletebyMediationFormId(id);
             mediaitonFormRepository.deleteById(id);
             return new GenericResponseDto("success","Mediation Deleted");
         }
