@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestRequestDto loginResponseDto){
-        System.out.println(loginResponseDto.getPassword()+"<-password,username->"+loginResponseDto.getUsername());
+//        System.out.println(loginResponseDto.getPassword()+"<-password,username->"+loginResponseDto.getUsername());
         return ResponseEntity.ok(authService.login(loginResponseDto));
     }
 

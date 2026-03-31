@@ -15,4 +15,6 @@ public interface LegalCaseRepository extends JpaRepository<LegalCase, Long> {
     Optional<LegalCase> findByAdmissionFormId(Long admissionId);
     long count();
     Optional<LegalCase> findById(Long id);
+
+    List<LegalCase> findByAdmissionFormIdIn(List<Long> admissionIds);
 }

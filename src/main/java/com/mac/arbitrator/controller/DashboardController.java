@@ -4,10 +4,7 @@ package com.mac.arbitrator.controller;
 import com.mac.arbitrator.dto.response.dashboard.DashboardResponseDto;
 import com.mac.arbitrator.service.DashboardService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = {"*"})
 @RestController
@@ -21,8 +18,18 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-    @GetMapping
-    public ResponseEntity<DashboardResponseDto> getDashboard() {
-        return ResponseEntity.ok(dashboardService.getDashboardData());
+    @GetMapping("/admin")
+    public ResponseEntity<DashboardResponseDto> getAdminDashboard() {
+        return ResponseEntity.ok(dashboardService.getAdminDashboard());
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<DashboardResponseDto> getUserDashboard(@PathVariable Long userId) {
+        return ResponseEntity.ok(dashboardService.getUserDashboard(userId));
+    }
+
+    @GetMapping("/arbitrator/{userId}")
+    public ResponseEntity<DashboardResponseDto> getArbitratorDashboard(@PathVariable Long userId) {
+        return ResponseEntity.ok(dashboardService.getArbitratorDashboard(userId));
     }
 }

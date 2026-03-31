@@ -19,4 +19,8 @@ public interface ArbitratorLegalCaseRepository extends JpaRepository<ArbitratorL
     );
     ArbitratorLegalCase findByLegalCaseId(Long id);
     Page<ArbitratorLegalCase> findAllByArbitratorId(Long arbitratorId, Pageable pageable);
+
+    Long countByArbitratorId(Long id);
+
+    List<ArbitratorLegalCase> findByArbitratorId(Long id);
 }
