@@ -36,10 +36,10 @@ public class LegalCaseLog {
     @Column(nullable = false)
     private LocalDate nextHearingDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String purposeOfHearing;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String awardStatement;
 
     @Column(nullable = true)

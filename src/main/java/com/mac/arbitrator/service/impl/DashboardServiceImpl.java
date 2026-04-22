@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -23,9 +25,10 @@ public class DashboardServiceImpl implements DashboardService {
     private final UserRepository userRepository;
     private final ArbitratorLegalCaseRepository arbitratorLegalCaseRepository;
     private final AdmissionFormUserRepository admissionFormUserRepository;
+    private final ArbitratorUserRepository arbitratorUserRepository;
 
 
-    public DashboardServiceImpl(LegalCaseRepository legalCaseRepository, AdmissionFormRepository admissionFormRepository, MediationFormRepository mediationFormRepository, LegalCaseHearingScheduleRepository legalCaseHearingScheduleRepository, ArbitratorRepository arbitratorRepository, UserRepository userRepository, ArbitratorLegalCaseRepository arbitratorLegalCaseRepository, AdmissionFormUserRepository admissionFormUserRepository) {
+    public DashboardServiceImpl(LegalCaseRepository legalCaseRepository, AdmissionFormRepository admissionFormRepository, MediationFormRepository mediationFormRepository, LegalCaseHearingScheduleRepository legalCaseHearingScheduleRepository, ArbitratorRepository arbitratorRepository, UserRepository userRepository, ArbitratorLegalCaseRepository arbitratorLegalCaseRepository, AdmissionFormUserRepository admissionFormUserRepository, ArbitratorUserRepository arbitratorUserRepository) {
         this.legalCaseRepository = legalCaseRepository;
         this.admissionFormRepository = admissionFormRepository;
         this.mediationFormRepository = mediationFormRepository;
@@ -34,6 +37,7 @@ public class DashboardServiceImpl implements DashboardService {
         this.userRepository = userRepository;
         this.arbitratorLegalCaseRepository = arbitratorLegalCaseRepository;
         this.admissionFormUserRepository = admissionFormUserRepository;
+        this.arbitratorUserRepository = arbitratorUserRepository;
     }
 
     @Override
@@ -114,12 +118,16 @@ public class DashboardServiceImpl implements DashboardService {
 
         DashboardResponseDto dto = new DashboardResponseDto();
 
+        ArbitratorUser arbitratorUser = arbitratorUserRepository.findByUserId(id).orElse(null);
+
+        Long arbitratorId = arbitratorUser.getArbitratorId();
+
         // ===== Total Cases for this Arbitrator =====
-        dto.setTotalCases(arbitratorLegalCaseRepository.countByArbitratorId(id));
+        dto.setTotalCases(arbitratorLegalCaseRepository.countByArbitratorId(arbitratorId));
 
         // ===== Get Case IDs assigned to this Arbitrator =====
         List<ArbitratorLegalCase> arbitratorCases =
-                arbitratorLegalCaseRepository.findByArbitratorId(id);
+                arbitratorLegalCaseRepository.findByArbitratorId(arbitratorId);
 
         List<Long> caseIds = arbitratorCases.stream()
                 .map(ArbitratorLegalCase::getLegalCaseId)
@@ -144,7 +152,7 @@ public class DashboardServiceImpl implements DashboardService {
 
                             // Since it's this arbitrator, we can directly set name
                             Arbitrator arb =
-                                    arbitratorRepository.findById(id).orElse(null);
+                                    arbitratorRepository.findById(arbitratorId).orElse(null);
 
                             if (arb != null) {
                                 u.setArbitratorName(arb.getFullName());

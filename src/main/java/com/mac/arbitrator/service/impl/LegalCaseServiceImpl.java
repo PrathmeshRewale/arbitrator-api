@@ -430,27 +430,60 @@ public class LegalCaseServiceImpl implements LegalCaseService {
         return legalCaseResponseDto;
     }
 
+//    @Override
+//    public Page<LegalCaseMniResponseDto> getAllLegalCaseByArbitratorId(PageRequest pageRequest, Long arbitratorId) {
+//
+//        // Step 1: Get mapping rows
+//        Page<ArbitratorLegalCase> arbitratorCases =
+//                arbitratorLegalCaseRepository.findAllByArbitratorId(arbitratorId, pageRequest);
+//
+//        arbitratorCases.forEach(obj->{
+//            System.out.println(obj.getLegalCaseId());
+//        });
+//
+//        // Step 2: Extract LegalCase IDs
+//        List<Long> caseIds = arbitratorCases.getContent().stream()
+//                .map(ArbitratorLegalCase::getLegalCaseId)
+//                .collect(Collectors.toList());
+//
+//        caseIds.forEach(System.out::println);
+//
+//        if (caseIds.isEmpty()) {
+//            return Page.empty(pageRequest);
+//        }
+//
+//        // Step 3: Fetch LegalCase entities
+//        Page<LegalCase> legalCases =
+//                legalCaseRepository.findByIdIn(caseIds, pageRequest);
+//
+//        legalCases.forEach(obj->{
+//            System.out.println(obj.getId());
+//        });
+//
+//        // Step 4: Map to Mini DTO
+//        return legalCases.map(this::mapToMiniDto);
+//    }
+
+
     @Override
     public Page<LegalCaseMniResponseDto> getAllLegalCaseByArbitratorId(PageRequest pageRequest, Long arbitratorId) {
 
-        // Step 1: Get mapping rows
-        Page<ArbitratorLegalCase> arbitratorCases =
-                arbitratorLegalCaseRepository.findAllByArbitratorId(arbitratorId, pageRequest);
+        // Step 1: Get ALL mappings (NO pagination here)
+        List<ArbitratorLegalCase> arbitratorCases =
+                arbitratorLegalCaseRepository.findAllByArbitratorId(arbitratorId);
 
-        // Step 2: Extract LegalCase IDs
-        List<Long> caseIds = arbitratorCases.getContent().stream()
+        List<Long> caseIds = arbitratorCases.stream()
                 .map(ArbitratorLegalCase::getLegalCaseId)
-                .collect(Collectors.toList());
+                .toList();
 
         if (caseIds.isEmpty()) {
             return Page.empty(pageRequest);
         }
 
-        // Step 3: Fetch LegalCase entities
+        // Step 2: Apply pagination ONLY here
         Page<LegalCase> legalCases =
                 legalCaseRepository.findByIdIn(caseIds, pageRequest);
 
-        // Step 4: Map to Mini DTO
         return legalCases.map(this::mapToMiniDto);
     }
 
